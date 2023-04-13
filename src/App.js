@@ -27,6 +27,9 @@ function App() {
             <li>
               <Link to="/register">Register</Link>
             </li>
+            <li>
+              <Logout />
+            </li>
           </ul>
         </nav>
         <Switch>
