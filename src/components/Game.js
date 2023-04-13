@@ -1,14 +1,13 @@
-import React from "react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Game = ({ game, handleClick }) => {
-  return (
-    <div>
-      <h3>{game.name}</h3>
+const Game = ({ game }) => (
+  <div>
+    <Link to={`/games/${game.id}`}>
+      <h2>{game.name}</h2>
       <img src={game.image} alt={game.name} />
-      <p>Number of players: {game.players}</p>
-      <button onClick={() => handleClick(game.id)}>Remove</button>
-    </div>
-  );
-};
+    </Link>
+  </div>
+);
 
 export default Game;
