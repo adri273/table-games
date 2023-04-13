@@ -1,40 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { db } from '../firebase';
+import React from "react";
+import { useGameContext } from "../contexts/GameContext";
+import Game from "./Game";
 
-function GameList() {
-  const [games, setGames] = useState([]);
+const GameList = () => {
+  const { games, dispatch } = useGameContext();
 
-  useEffect(() => {
-    const unsubscribe = db.collection('games').onSnapshot((snapshot) => {
-      const newGames = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setGames(newGames);
+  const handleClick = (id) => {
+    dispatch({
+      type: "REMOVE_GAME",
+      id,
     });
-
-    return unsubscribe;
-  }, []);
+  };
 
   return (
     <div>
-      <h1>My Board Games</h1>
-      <Link to="/login">Log in</Link>
-      <ul>
-        {games.map((game) => (
-          <li key={game.id}>
-            <Link to={`/game/${game.id}`}>
-              <h2>{game.name}</h2>
-              <img src={game.image} alt={game.name} />
-              <p>Players: {game.players}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <h2>Game List</h2>
+      {games.length > 0 ? (
+        games.map((game) => (
+          <Game key={game.id} game={game} handleClick={handleClick} />
+        ))
+      ) : (
+        <p>No games added yet.</p>
+      )}
     </div>
   );
-}
+};
 
 export default GameList;
