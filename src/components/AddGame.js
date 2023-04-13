@@ -1,61 +1,66 @@
-import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useGameContext } from "../contexts/GameContext";
+import React, { useState, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
+import { FirebaseContext } from '../contexts/FirebaseContext';
 
 const AddGame = () => {
-  const [name, setName] = useState("");
-  const [players, setPlayers] = useState("");
-  const [image, setImage] = useState("");
-  const { dispatch } = useGameContext();
+  const [name, setName] = useState('');
+  const [players, setPlayers] = useState('');
+  const [image, setImage] = useState(null);
+  const { firebase } = useContext(FirebaseContext);
+  const history = useHistory();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch({
-      type: "ADD_GAME",
-      game: {
-        id: uuidv4(),
-        name,
-        players,
-        image,
-      },
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const storageRef = firebase.storage().ref();
+    const imageRef = storageRef.child(image.name);
+    imageRef.put(image).then(() => {
+      imageRef.getDownloadURL().then((url) => {
+        const gamesRef = firebase.firestore().collection('games');
+        gamesRef.add({
+          name,
+          players,
+          image: url,
+        }).then(() => {
+          history.push('/');
+        });
+      });
     });
-    setName("");
-    setPlayers("");
-    setImage("");
   };
 
   return (
     <div>
-      <h2>Add Game</h2>
+      <h1>Add Game</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Name:</label>
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
+            id="name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(event) => setName(event.target.value)}
             required
           />
         </div>
         <div>
-          <label>Number of players:</label>
-          <input
-            type="number"
-            value={players}
-            onChange={(e) => setPlayers(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Image:</label>
+          <label htmlFor="players">Players:</label>
           <input
             type="text"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
+            id="players"
+            value={players}
+            onChange={(event) => setPlayers(event.target.value)}
             required
           />
         </div>
-        <button type="submit">Add</button>
+        <div>
+          <label htmlFor="image">Image:</label>
+          <input
+            type="file"
+            id="image"
+            onChange={(event) => setImage(event.target.files[0])}
+            required
+          />
+        </div>
+        <button type="submit">Add Game</button>
       </form>
     </div>
   );
