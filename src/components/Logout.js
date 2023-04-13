@@ -1,13 +1,15 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
-import firebase from '../utils/firebase';
+import React, { useContext } from 'react';
+import { FirebaseContext } from '../contexts/FirebaseContext';
 
 const Logout = () => {
-  const history = useHistory();
+  const { firebase } = useContext(FirebaseContext);
 
   const handleLogout = async () => {
-    await firebase.auth().signOut();
-    history.push('/');
+    try {
+      await firebase.auth().signOut();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
