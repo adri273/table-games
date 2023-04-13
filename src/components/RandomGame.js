@@ -1,32 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import firebase from '../utils/firebase';
+import React, { useContext, useState, useEffect } from "react";
+import { FirebaseContext } from "../contexts/FirebaseContext";
+import { Link } from "react-router-dom";
 
 const RandomGame = () => {
-  const [randomGame, setRandomGame] = useState(null);
+  const { db } = useContext(FirebaseContext);
+  const [games, setGames] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection('games')
-      .onSnapshot((snapshot) => {
-        const games = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        const randomIndex = Math.floor(Math.random() * games.length);
-        setRandomGame(games[randomIndex]);
-      });
+    const unsubscribe = db.collection("games").onSnapshot((snapshot) => {
+      const gamesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setGames(gamesData);
+    });
+
     return () => unsubscribe();
-  }, []);
+  }, [db]);
+
+  const randomIndex = Math.floor(Math.random() * games.length);
+  const randomGame = games[randomIndex];
 
   return (
-    <div>
-      <h1>Random Game</h1>
-{randomGame ? (
-        <div>
-          <h2>{randomGame.name}</h2>
-          <img src={randomGame.image} alt={randomGame.name} />
-          <p>Players: {randomGame.players}</p>
+    <div className="random-game-container">
+      <h2>Random Game:</h2>
+      {games.length ? (
+        <div className="game-details-container">
+          <div className="game-image-container">
+            <img
+              src={randomGame.image}
+              alt={`Cover of ${randomGame.name}`}
+              className="game-image"
+            />
+          </div>
+          <div className="game-details">
+            <h3 className="game-name">{randomGame.name}</h3>
+            <p>Number of Players: {randomGame.players}</p>
+            <Link to={`/game/${randomGame.id}`} className="link-button">
+              View Details
+            </Link>
+          </div>
         </div>
       ) : (
         <p>Loading...</p>
