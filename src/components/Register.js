@@ -1,51 +1,42 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import firebase from '../utils/firebase';
+import React, { useState, useContext } from 'react';
+import { FirebaseContext } from '../contexts/FirebaseContext';
 
 const Register = () => {
-  const history = useHistory();
+  const { firebase } = useContext(FirebaseContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [name, setName] = useState('');
   const [error, setError] = useState(null);
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const handleRegister = async (event) => {
+    event.preventDefault();
     try {
       await firebase.auth().createUserWithEmailAndPassword(email, password);
-      const user = firebase.auth().currentUser;
-      await user.updateProfile({
-        displayName: displayName,
+      await firebase.auth().currentUser.updateProfile({
+        displayName: name,
       });
-      history.push('/');
     } catch (error) {
-      setError('Error registering with email and password');
+      setError(error);
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <label>
-          Display Name:
-          <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-        </label>
-        <br />
-        <label>
-          Email:
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-        <br />
-        <button type="submit">Register</button>
-      </form>
-      {error && <p>{error}</p>}
-    </div>
+    <form onSubmit={handleRegister}>
+      <label>
+        Email:
+        <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+      </label>
+      <label>
+        Password:
+        <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+      </label>
+      <label>
+        Name:
+        <input type="text" value={name} onChange={(event) => setName(event.target.value)} />
+      </label>
+      <button type="submit">Register</button>
+      {error && <div>{error.message}</div>}
+    </form>
   );
 };
 
