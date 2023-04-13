@@ -44,4 +44,9 @@ const Register = () => {
         <br />
         <button type="submit">Register</button>
       </form>
-      {error &&
+      {error && <p>{error}</p>}
+    </div>
+  );
+};
+
+export default Register;
