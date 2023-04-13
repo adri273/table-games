@@ -1,11 +1,16 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const GameListItem = ({ game }) => (
-  <div>
-    <img src={game.image} alt={game.name} />
-    <h2>{game.name}</h2>
-    <p>Players: {game.players}</p>
-  </div>
-);
+const GameListItem = ({ game }) => {
+  return (
+    <li>
+      <Link to={`/games/${game.id}`}>
+        <img src={game.image} alt={game.name} />
+        <h3>{game.name}</h3>
+        <p>Number of Players: {game.players}</p>
+      </Link>
+    </li>
+  );
+};
 
 export default GameListItem;
